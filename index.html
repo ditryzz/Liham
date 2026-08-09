@@ -61,14 +61,17 @@ html,body{
   opacity:.85;
 }
 
-.branch{
-  position:absolute; bottom:26vh; right:8%;
-  width:220px; height:60px;
+.glow-behind{
+  position:absolute; left:50%; top:46%;
+  width:280px; height:280px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background: radial-gradient(circle, rgba(201,165,106,0.28), rgba(201,165,106,0) 70%);
   opacity:0;
-  transition: opacity 1s ease 3.4s;
+  transition: opacity 1.4s ease;
+  pointer-events:none;
 }
-.branch svg{ width:100%; height:100%; }
-.branch.show{ opacity:1; }
+.glow-behind.show{ opacity:1; }
 
 /* ---------------- INTRO TEXT ---------------- */
 
@@ -93,46 +96,65 @@ html,body{
 /* ---------------- DOVE ---------------- */
 
 .dove-wrap{
-  position:absolute; top:38%; left:-20%;
-  width:120px; height:90px;
-  animation: fly 4.4s cubic-bezier(.45,.05,.55,.95) forwards;
+  position:absolute; left:50%; top:-6%;
+  width:clamp(130px, 30vw, 190px);
+  aspect-ratio: 140 / 160;
+  transform: translate(-50%,-50%) scale(.2);
+  animation: flyCenter 4.4s cubic-bezier(.32,.1,.3,1) forwards;
   animation-delay: 1.4s;
 }
-@keyframes fly{
-  0%   { left:-20%; top:40%; transform: scale(.7) rotate(6deg); }
-  55%  { left:52%;  top:14%; transform: scale(.95) rotate(-3deg); }
-  85%  { left:70%;  top:34%; transform: scale(1) rotate(4deg); }
-  100% { left:74%;  top:41%; transform: scale(1) rotate(0deg); }
+@keyframes flyCenter{
+  0%   { top:-6%;  left:50%; transform: translate(-50%,-50%) scale(.18) rotate(-3deg); opacity:.6; }
+  35%  { top:20%;  left:47%; transform: translate(-50%,-50%) scale(.5)  rotate(3deg);  opacity:1; }
+  65%  { top:38%;  left:53%; transform: translate(-50%,-50%) scale(.8)  rotate(-2deg); }
+  88%  { top:47%;  left:49%; transform: translate(-50%,-50%) scale(1.02) rotate(1deg); }
+  100% { top:46%;  left:50%; transform: translate(-50%,-50%) scale(1)   rotate(0deg); }
+}
+.dove-wrap.hover{
+  top:46%; left:50%;
+  animation: hoverBob 3.6s ease-in-out infinite;
+}
+@keyframes hoverBob{
+  0%,100%{ transform: translate(-50%,-50%) scale(1) rotate(0deg) translateY(0); }
+  50%{ transform: translate(-50%,-50%) scale(1) rotate(0deg) translateY(-6px); }
 }
 
-.dove{ width:100%; height:100%; overflow:visible; }
+.dove{ width:100%; height:100%; overflow:visible; display:block; }
 
-.wing-left, .wing-right{
-  transform-origin: 60px 40px;
-  animation: flap 0.42s ease-in-out infinite;
+.wingF-left, .wingF-right{
+  animation: flapF 0.46s ease-in-out infinite;
 }
-.wing-right{ animation-delay:.02s; }
-@keyframes flap{
-  0%,100%{ transform: rotate(0deg) scaleY(1); }
-  50%{ transform: rotate(-32deg) scaleY(.7); }
+.wingF-left{ transform-origin: 52px 78px; }
+.wingF-right{ transform-origin: 88px 78px; animation-delay:.01s; }
+@keyframes flapF{
+  0%,100%{ transform: rotate(0deg); }
+  50%{ transform: rotate(-22deg); }
+}
+.wingF-right{ animation-name: flapF-r; }
+@keyframes flapF-r{
+  0%,100%{ transform: rotate(0deg); }
+  50%{ transform: rotate(22deg); }
 }
 
 .letter-carry{
-  opacity:0;
-  animation: showCarry .01s linear forwards;
-  animation-delay: 1.4s;
+  opacity:1;
 }
-@keyframes showCarry{ to{ opacity:1 } }
 
 .thread{
   stroke:var(--gold); stroke-width:1; opacity:.85;
   animation: sway 2.6s ease-in-out infinite;
-  transform-origin: 60px 62px;
+  transform-origin: 70px 116px;
 }
 @keyframes sway{ 0%,100%{ transform:rotate(-2deg) } 50%{ transform:rotate(2deg) } }
 
 /* envelope settles once landed */
-.dove-wrap.landed .letter-carry{ animation: settle 1s ease forwards; }
+.dove-wrap.landed .letter-carry{ opacity:1; animation: settle 1s ease forwards; }
+
+.dove-wrap.skip-flight{
+  animation:none !important;
+  left:50% !important; top:46% !important;
+  transform: translate(-50%,-50%) scale(1) rotate(0deg) !important;
+}
 @keyframes settle{ to{ transform: translateY(2px); } }
 
 /* prompt to open */
@@ -154,8 +176,8 @@ html,body{
 @keyframes pulse{ 0%,100%{ opacity:.4; transform:scale(.8);} 50%{ opacity:1; transform:scale(1.15);} }
 
 .hit-area{
-  position:absolute; top:38%; right:6%; width:180px; height:160px;
-  cursor:pointer; z-index:5;
+  position:absolute; inset:-26px;
+  cursor:pointer; z-index:5; touch-action:manipulation;
   opacity:0; transition: opacity .4s ease;
 }
 .hit-area.active{ opacity:1; pointer-events:auto; }
@@ -244,9 +266,10 @@ html,body{
 }
 
 @media (prefers-reduced-motion: reduce){
-  .dove-wrap{ animation:none; left:74%; top:41%; }
-  .wing-left,.wing-right{ animation:none; }
-  .branch{ transition:none; opacity:1; }
+  .dove-wrap{ animation:none; }
+  .dove-wrap.hover{ animation:none; }
+  .wingF-left,.wingF-right{ animation:none; }
+  .glow-behind{ transition:none; }
   .prompt{ transition:none; }
   .letter-stage{ transition:none; }
   .paper{ transition:none; }
@@ -259,9 +282,7 @@ html,body{
   <div class="stars" id="stars"></div>
   <div class="moon"></div>
 
-  <div class="branch" id="branch">
-    <svg viewBox="0 0 220 60"><path d="M0 40 Q60 10 120 30 T220 20" stroke="#4d5479" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
-  </div>
+  <div class="glow-behind" id="glow"></div>
 
   <div class="intro">
     <span class="eyebrow">isang liham</span>
@@ -269,32 +290,45 @@ html,body{
   </div>
 
   <div class="dove-wrap" id="dove">
-    <svg class="dove" viewBox="0 0 120 90">
-      <g class="wing-left">
-        <path d="M55 40 C30 28 10 30 2 42 C18 46 38 48 55 44 Z" fill="#f4ecd8"/>
+    <svg class="dove" viewBox="0 0 140 160">
+      <!-- tail, behind body -->
+      <path d="M58 108 L70 130 L82 108 Z" fill="#e3d6b8"/>
+
+      <!-- wings, spread symmetrically, flapping toward viewer -->
+      <g class="wingF-left">
+        <path d="M50 66 C22 50 4 54 2 72 C4 88 24 92 50 84 C48 78 48 72 50 66 Z" fill="#f4ecd8"/>
       </g>
-      <g class="wing-right">
-        <path d="M65 40 C90 28 110 30 118 42 C102 46 82 48 65 44 Z" fill="#e3d6b8"/>
+      <g class="wingF-right">
+        <path d="M90 66 C118 50 136 54 138 72 C136 88 116 92 90 84 C92 78 92 72 90 66 Z" fill="#e3d6b8"/>
       </g>
-      <ellipse cx="60" cy="42" rx="20" ry="12" fill="#faf5e8"/>
-      <path d="M60 32 C64 26 74 24 80 28 C74 30 68 34 64 38 Z" fill="#faf5e8"/>
-      <circle cx="76" cy="30" r="6.5" fill="#faf5e8"/>
-      <circle cx="78.5" cy="28.5" r="1" fill="#232849"/>
-      <path d="M82 29 L88 30 L82 32 Z" fill="#c9a56a"/>
-      <path d="M45 46 C35 52 32 58 34 62" stroke="#faf5e8" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+      <!-- body -->
+      <ellipse cx="70" cy="80" rx="24" ry="32" fill="#faf5e8"/>
+      <ellipse cx="70" cy="92" rx="14" ry="18" fill="#f0e6d2"/>
+
+      <!-- legs -->
+      <line x1="62" y1="106" x2="62" y2="115" stroke="#c9a56a" stroke-width="2" stroke-linecap="round"/>
+      <line x1="78" y1="106" x2="78" y2="115" stroke="#c9a56a" stroke-width="2" stroke-linecap="round"/>
+
+      <!-- head, facing forward -->
+      <circle cx="70" cy="38" r="17" fill="#faf5e8"/>
+      <circle cx="62" cy="35" r="2.3" fill="#232849"/>
+      <circle cx="78" cy="35" r="2.3" fill="#232849"/>
+      <circle cx="61" cy="34" r=".7" fill="#faf5e8"/>
+      <circle cx="77" cy="34" r=".7" fill="#faf5e8"/>
+      <path d="M64 45 L76 45 L70 54 Z" fill="#c9a56a"/>
 
       <g class="letter-carry">
-        <line class="thread" x1="60" y1="52" x2="60" y2="66"/>
-        <g transform="translate(46,66)">
+        <line class="thread" x1="70" y1="116" x2="70" y2="132"/>
+        <g transform="translate(56,132)">
           <rect x="0" y="0" width="28" height="19" rx="1.5" fill="var(--paper)" stroke="#c9a56a" stroke-width="1"/>
           <path d="M0 0 L14 11 L28 0" fill="none" stroke="#c9a56a" stroke-width="1"/>
           <circle cx="14" cy="10" r="3.4" fill="var(--wax)"/>
         </g>
       </g>
     </svg>
+    <div class="hit-area" id="hitArea" aria-label="Buksan ang liham" role="button" tabindex="0"></div>
   </div>
-
-  <div class="hit-area" id="hitArea" aria-label="Buksan ang liham" role="button" tabindex="0"></div>
 
   <div class="prompt" id="prompt">
     hipuin ang liham
@@ -311,16 +345,18 @@ html,body{
     <button class="close-letter" id="closeLetter" aria-label="Isara">&times;</button>
     <div class="to">Para kay K,</div>
 
-    <p>Alam kong medyo kakaiba ang paraan ko ng pagpapadala nito — lumipad pa dapat 'to sakay ng kalapati bago ka marating. Pero kahit papaano, gusto kong maabot ka ng mga salitang ito, kahit paikot-ikot muna bago dumating.</p>
+    <p>Hindi pa tayo nagkakasama nang personal. Wala pang tunay na tawanang narinig ang isa't isa nang harapan, wala pang yakap na nagmula sa totoong presensya, chat lang muna ang naging daan natin. Pero kahit ganito, kahit sa likod lamang ng mga salitang lumalabas sa screen, may kislap na dala-dala ang bawat mensahe mo.</p>
 
-    <p>Mula nang unang mapansin kita, parang lumiliit ang paligid tuwing kasama kita. Simple lang naman itong liham na 'to. Gusto kitang makilala pa. Hindi lang yung nakikita mula sa malayo, kundi yung totoong ikaw — mga bagay na nagpapatawa sa'yo, mga pangarap mong hindi pa nasasabi, kahit pati na yung mga araw na hindi maganda.</p>
+    <p>Kakaiba ang pananabik na ito. Nangungulila ako sa isang taong hindi ko pa nasasaksihan nang buo, kundi mula lamang sa mga bahaging kusa mong ibinabahagi tuwing nag-uusap tayo. Doon pala pwedeng magsimula ang kilig, sa pagitan ng typing, sa oras na hinihintay kong dumating ang sagot mo.</p>
 
-    <p>Hindi ko alam kung saan pupunta 'to, pero gusto kong subukan nang dahan-dahan. Kung okay lang sa'yo, simulan na lang natin sa kwentuhan, sa tawanan, sa kung anong dumating.</p>
+    <p>Gusto kitang makilala nang lubusan. Hindi lang yung nakikita sa mga salita, kundi yung ikaw na totoo, yung tinig mo kapag natatawa, yung kilos mo kapag kinakabahan, yung mga bagay na hindi kayang ipaliwanag ng text. Gusto kong marating ka, hindi lang sa mensahe, kundi sa totoong buhay, sa harapan, sa isang tanawing hindi na hinihintay ang signal.</p>
 
-    <p>Salamat sa pagbasa hanggang dulo. Sana, unti-unti, mas makilala pa kita.</p>
+    <p>Marahil kakaiba ang paraan ng pagdating ng liham na ito, sakay man ito ng guniguni ng isang kalapati. Pero taos-puso ito. Walang kunwari, walang paikot-ikot. Gusto lang kitang makilala pa, hakbang-hakbang, hanggang unti-unting mawala ang distansiyang nagitna sa atin.</p>
+
+    <p>Sana, balang araw, hindi na tayo laging nasa magkabilang dulo ng screen.</p>
 
     <div class="signoff">
-      Lubos na sumasa'yo,
+      Buong pusong sumasa'yo,
       <span class="sig-name">F</span>
     </div>
   </div>
@@ -339,7 +375,7 @@ for(let i=0;i<70;i++){
 }
 
 const dove = document.getElementById('dove');
-const branch = document.getElementById('branch');
+const glow = document.getElementById('glow');
 const prompt = document.getElementById('prompt');
 const hitArea = document.getElementById('hitArea');
 const skipBtn = document.getElementById('skipBtn');
@@ -348,8 +384,13 @@ const closeLetter = document.getElementById('closeLetter');
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function reveal(){
-  branch.classList.add('show');
+function reveal(instant){
+  if(instant){
+    dove.classList.add('skip-flight');
+  } else {
+    dove.classList.add('hover');
+  }
+  glow.classList.add('show');
   dove.classList.add('landed');
   prompt.classList.add('show');
   hitArea.classList.add('active');
@@ -357,9 +398,9 @@ function reveal(){
 }
 
 if(reduced){
-  reveal();
+  reveal(true);
 } else {
-  setTimeout(reveal, 5900);
+  setTimeout(()=>reveal(false), 5900);
 }
 
 function openLetter(){
@@ -374,7 +415,7 @@ function closeLetterFn(){
 hitArea.addEventListener('click', openLetter);
 hitArea.addEventListener('keypress', (e)=>{ if(e.key==='Enter' || e.key===' ') openLetter(); });
 closeLetter.addEventListener('click', closeLetterFn);
-skipBtn.addEventListener('click', reveal);
+skipBtn.addEventListener('click', ()=>reveal(true));
 
 function spawnFeathers(){
   for(let i=0;i<10;i++){
