@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>para kay K</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Mrs+Saint+Delafield&display=swap');
+
+:root{
+  --ink-deep:      #232849;
+  --ink-mid:       #4d5479;
+  --dusk-1:        #1b1e3a;
+  --dusk-2:        #363a68;
+  --dusk-3:        #6a6f9c;
+  --blush:         #d99a8c;
+  --gold:          #c9a56a;
+  --paper:         #f4ecd8;
+  --paper-shadow:  #e3d6b8;
+  --wax:           #9c3b3b;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html,body{
+  height:100%;
+  background:var(--dusk-1);
+  overflow:hidden;
+  font-family:'EB Garamond', serif;
+}
+
+/* ---------------- SKY SCENE ---------------- */
+
+.sky{
+  position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse at 80% 15%, rgba(201,165,106,0.18), transparent 45%),
+    linear-gradient(180deg, var(--dusk-1) 0%, var(--dusk-2) 45%, var(--dusk-3) 100%);
+  overflow:hidden;
+  transition: filter 1.2s ease, transform 1.2s ease;
+}
+
+.stars{ position:absolute; inset:0; }
+.star{
+  position:absolute; width:2px; height:2px; border-radius:50%;
+  background:#f4ecd8; opacity:.6;
+  animation: twinkle 4s ease-in-out infinite;
+}
+@keyframes twinkle{ 0%,100%{opacity:.15} 50%{opacity:.85} }
+
+.moon{
+  position:absolute; top:8%; right:12%;
+  width:64px; height:64px; border-radius:50%;
+  background: radial-gradient(circle at 35% 35%, #fff9e8, var(--gold) 75%);
+  box-shadow: 0 0 40px 6px rgba(201,165,106,0.35);
+}
+
+.hill{
+  position:absolute; bottom:0; left:0; right:0; height:32vh;
+  background: linear-gradient(180deg, transparent, var(--ink-deep) 60%);
+  opacity:.85;
+}
+
+.branch{
+  position:absolute; bottom:26vh; right:8%;
+  width:220px; height:60px;
+  opacity:0;
+  transition: opacity 1s ease 3.4s;
+}
+.branch svg{ width:100%; height:100%; }
+.branch.show{ opacity:1; }
+
+/* ---------------- INTRO TEXT ---------------- */
+
+.intro{
+  position:absolute; top:14%; left:50%; transform:translateX(-50%);
+  text-align:center; color:var(--paper);
+  opacity:0; animation: fadeIn 2s ease forwards;
+  width:90%; max-width:520px;
+}
+.intro .eyebrow{
+  font-family:'Cormorant Garamond', serif; font-style:italic;
+  letter-spacing:.14em; font-size:.8rem; text-transform:uppercase;
+  color:var(--blush); opacity:.85;
+}
+.intro h1{
+  font-family:'Cormorant Garamond', serif; font-weight:500;
+  font-size:clamp(1.6rem, 5vw, 2.4rem);
+  margin-top:.4rem; letter-spacing:.02em;
+}
+@keyframes fadeIn{ to{ opacity:1 } }
+
+/* ---------------- DOVE ---------------- */
+
+.dove-wrap{
+  position:absolute; top:38%; left:-20%;
+  width:120px; height:90px;
+  animation: fly 4.4s cubic-bezier(.45,.05,.55,.95) forwards;
+  animation-delay: 1.4s;
+}
+@keyframes fly{
+  0%   { left:-20%; top:40%; transform: scale(.7) rotate(6deg); }
+  55%  { left:52%;  top:14%; transform: scale(.95) rotate(-3deg); }
+  85%  { left:70%;  top:34%; transform: scale(1) rotate(4deg); }
+  100% { left:74%;  top:41%; transform: scale(1) rotate(0deg); }
+}
+
+.dove{ width:100%; height:100%; overflow:visible; }
+
+.wing-left, .wing-right{
+  transform-origin: 60px 40px;
+  animation: flap 0.42s ease-in-out infinite;
+}
+.wing-right{ animation-delay:.02s; }
+@keyframes flap{
+  0%,100%{ transform: rotate(0deg) scaleY(1); }
+  50%{ transform: rotate(-32deg) scaleY(.7); }
+}
+
+.letter-carry{
+  opacity:0;
+  animation: showCarry .01s linear forwards;
+  animation-delay: 1.4s;
+}
+@keyframes showCarry{ to{ opacity:1 } }
+
+.thread{
+  stroke:var(--gold); stroke-width:1; opacity:.85;
+  animation: sway 2.6s ease-in-out infinite;
+  transform-origin: 60px 62px;
+}
+@keyframes sway{ 0%,100%{ transform:rotate(-2deg) } 50%{ transform:rotate(2deg) } }
+
+/* envelope settles once landed */
+.dove-wrap.landed .letter-carry{ animation: settle 1s ease forwards; }
+@keyframes settle{ to{ transform: translateY(2px); } }
+
+/* prompt to open */
+.prompt{
+  position:absolute; left:50%; bottom:16%; transform:translateX(-50%);
+  color:var(--paper); font-family:'Cormorant Garamond', serif; font-style:italic;
+  font-size:1rem; letter-spacing:.06em; text-align:center;
+  opacity:0; pointer-events:none;
+  transition: opacity 1s ease;
+}
+.prompt.show{ opacity:.9; pointer-events:auto; }
+.prompt .glow{
+  display:block; margin-top:.35rem;
+  width:10px; height:10px; border-radius:50%;
+  background:var(--gold); margin-left:auto; margin-right:auto;
+  box-shadow:0 0 12px 4px rgba(201,165,106,.6);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{ opacity:.4; transform:scale(.8);} 50%{ opacity:1; transform:scale(1.15);} }
+
+.hit-area{
+  position:absolute; top:38%; right:6%; width:180px; height:160px;
+  cursor:pointer; z-index:5;
+  opacity:0; transition: opacity .4s ease;
+}
+.hit-area.active{ opacity:1; pointer-events:auto; }
+.hit-area:not(.active){ pointer-events:none; }
+
+/* ---------------- SKIP BUTTON ---------------- */
+.skip{
+  position:fixed; top:20px; right:20px; z-index:20;
+  background:transparent; border:1px solid rgba(244,236,216,.35);
+  color:var(--paper); font-family:'EB Garamond',serif; font-size:.78rem;
+  letter-spacing:.08em; padding:.5rem .9rem; border-radius:999px;
+  cursor:pointer; opacity:.7; transition:opacity .3s ease, border-color .3s ease;
+}
+.skip:hover{ opacity:1; border-color:rgba(244,236,216,.7); }
+.skip.hide{ display:none; }
+
+/* ---------------- LETTER (OPENED) ---------------- */
+
+.letter-stage{
+  position:fixed; inset:0; z-index:30;
+  display:flex; align-items:center; justify-content:center;
+  padding: 6vh 5vw;
+  opacity:0; pointer-events:none;
+  transition: opacity .9s ease;
+  background: radial-gradient(ellipse at center, rgba(27,30,58,.55), rgba(15,16,32,.92));
+}
+.letter-stage.open{ opacity:1; pointer-events:auto; }
+
+.paper{
+  position:relative;
+  width:min(560px, 92vw);
+  max-height:86vh;
+  overflow-y:auto;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,0) 12%),
+    var(--paper);
+  color:var(--ink-deep);
+  padding: 3.2rem 2.6rem 2.6rem;
+  border-radius:2px;
+  box-shadow: 0 30px 70px rgba(0,0,0,.5), 0 0 0 1px var(--paper-shadow);
+  transform: translateY(40px) scale(.96);
+  opacity:0;
+  transition: transform .8s cubic-bezier(.2,.8,.2,1), opacity .8s ease;
+}
+.letter-stage.open .paper{ transform:translateY(0) scale(1); opacity:1; }
+
+.paper::before{
+  content:''; position:absolute; inset:14px;
+  border:1px solid rgba(35,40,73,.15);
+  pointer-events:none;
+}
+
+.paper .to{
+  font-family:'Cormorant Garamond', serif; font-style:italic;
+  font-size:1.15rem; color:var(--ink-mid); margin-bottom:1.4rem;
+}
+
+.paper p{
+  font-family:'EB Garamond', serif; font-size:1.08rem; line-height:1.85;
+  margin-bottom:1.1rem; color:var(--ink-deep);
+}
+
+.paper .signoff{
+  margin-top:1.6rem; font-family:'Cormorant Garamond', serif; font-style:italic;
+  font-size:1rem; color:var(--ink-mid);
+}
+.paper .sig-name{
+  display:block; margin-top:.3rem;
+  font-family:'Mrs Saint Delafield', cursive;
+  font-size:2.4rem; color:var(--wax);
+}
+
+.close-letter{
+  position:absolute; top:14px; right:16px;
+  background:none; border:none; font-size:1.4rem; color:var(--ink-mid);
+  cursor:pointer; line-height:1; padding:.3rem .5rem;
+}
+.close-letter:hover{ color:var(--wax); }
+
+.feather{
+  position:fixed; top:-40px; z-index:31; pointer-events:none;
+  opacity:.85; animation: drift linear forwards;
+}
+@keyframes drift{
+  to{ transform: translateY(110vh) translateX(var(--dx,40px)) rotate(220deg); opacity:0; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .dove-wrap{ animation:none; left:74%; top:41%; }
+  .wing-left,.wing-right{ animation:none; }
+  .branch{ transition:none; opacity:1; }
+  .prompt{ transition:none; }
+  .letter-stage{ transition:none; }
+  .paper{ transition:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="sky" id="sky">
+  <div class="stars" id="stars"></div>
+  <div class="moon"></div>
+
+  <div class="branch" id="branch">
+    <svg viewBox="0 0 220 60"><path d="M0 40 Q60 10 120 30 T220 20" stroke="#4d5479" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+  </div>
+
+  <div class="intro">
+    <span class="eyebrow">isang liham</span>
+    <h1>may dumarating sa'yo, K</h1>
+  </div>
+
+  <div class="dove-wrap" id="dove">
+    <svg class="dove" viewBox="0 0 120 90">
+      <g class="wing-left">
+        <path d="M55 40 C30 28 10 30 2 42 C18 46 38 48 55 44 Z" fill="#f4ecd8"/>
+      </g>
+      <g class="wing-right">
+        <path d="M65 40 C90 28 110 30 118 42 C102 46 82 48 65 44 Z" fill="#e3d6b8"/>
+      </g>
+      <ellipse cx="60" cy="42" rx="20" ry="12" fill="#faf5e8"/>
+      <path d="M60 32 C64 26 74 24 80 28 C74 30 68 34 64 38 Z" fill="#faf5e8"/>
+      <circle cx="76" cy="30" r="6.5" fill="#faf5e8"/>
+      <circle cx="78.5" cy="28.5" r="1" fill="#232849"/>
+      <path d="M82 29 L88 30 L82 32 Z" fill="#c9a56a"/>
+      <path d="M45 46 C35 52 32 58 34 62" stroke="#faf5e8" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+      <g class="letter-carry">
+        <line class="thread" x1="60" y1="52" x2="60" y2="66"/>
+        <g transform="translate(46,66)">
+          <rect x="0" y="0" width="28" height="19" rx="1.5" fill="var(--paper)" stroke="#c9a56a" stroke-width="1"/>
+          <path d="M0 0 L14 11 L28 0" fill="none" stroke="#c9a56a" stroke-width="1"/>
+          <circle cx="14" cy="10" r="3.4" fill="var(--wax)"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <div class="hit-area" id="hitArea" aria-label="Buksan ang liham" role="button" tabindex="0"></div>
+
+  <div class="prompt" id="prompt">
+    hipuin ang liham
+    <span class="glow"></span>
+  </div>
+
+  <div class="hill"></div>
+</div>
+
+<button class="skip" id="skipBtn">laktawan</button>
+
+<div class="letter-stage" id="letterStage">
+  <div class="paper">
+    <button class="close-letter" id="closeLetter" aria-label="Isara">&times;</button>
+    <div class="to">Para kay K,</div>
+
+    <p>Alam kong medyo kakaiba ang paraan ko ng pagpapadala nito — lumipad pa dapat 'to sakay ng kalapati bago ka marating. Pero kahit papaano, gusto kong maabot ka ng mga salitang ito, kahit paikot-ikot muna bago dumating.</p>
+
+    <p>Mula nang unang mapansin kita, parang lumiliit ang paligid tuwing kasama kita. Simple lang naman itong liham na 'to. Gusto kitang makilala pa. Hindi lang yung nakikita mula sa malayo, kundi yung totoong ikaw — mga bagay na nagpapatawa sa'yo, mga pangarap mong hindi pa nasasabi, kahit pati na yung mga araw na hindi maganda.</p>
+
+    <p>Hindi ko alam kung saan pupunta 'to, pero gusto kong subukan nang dahan-dahan. Kung okay lang sa'yo, simulan na lang natin sa kwentuhan, sa tawanan, sa kung anong dumating.</p>
+
+    <p>Salamat sa pagbasa hanggang dulo. Sana, unti-unti, mas makilala pa kita.</p>
+
+    <div class="signoff">
+      Lubos na sumasa'yo,
+      <span class="sig-name">F</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const starsEl = document.getElementById('stars');
+for(let i=0;i<70;i++){
+  const s = document.createElement('div');
+  s.className='star';
+  s.style.left = Math.random()*100+'%';
+  s.style.top = Math.random()*70+'%';
+  s.style.animationDelay = (Math.random()*4)+'s';
+  s.style.width = s.style.height = (Math.random()*1.6+1)+'px';
+  starsEl.appendChild(s);
+}
+
+const dove = document.getElementById('dove');
+const branch = document.getElementById('branch');
+const prompt = document.getElementById('prompt');
+const hitArea = document.getElementById('hitArea');
+const skipBtn = document.getElementById('skipBtn');
+const letterStage = document.getElementById('letterStage');
+const closeLetter = document.getElementById('closeLetter');
+
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function reveal(){
+  branch.classList.add('show');
+  dove.classList.add('landed');
+  prompt.classList.add('show');
+  hitArea.classList.add('active');
+  skipBtn.classList.add('hide');
+}
+
+if(reduced){
+  reveal();
+} else {
+  setTimeout(reveal, 5900);
+}
+
+function openLetter(){
+  letterStage.classList.add('open');
+  prompt.classList.remove('show');
+  spawnFeathers();
+}
+function closeLetterFn(){
+  letterStage.classList.remove('open');
+}
+
+hitArea.addEventListener('click', openLetter);
+hitArea.addEventListener('keypress', (e)=>{ if(e.key==='Enter' || e.key===' ') openLetter(); });
+closeLetter.addEventListener('click', closeLetterFn);
+skipBtn.addEventListener('click', reveal);
+
+function spawnFeathers(){
+  for(let i=0;i<10;i++){
+    setTimeout(()=>{
+      const f = document.createElement('div');
+      f.className='feather';
+      f.style.left = (Math.random()*90+2)+'%';
+      f.style.setProperty('--dx', (Math.random()*80-40)+'px');
+      f.style.animationDuration = (5+Math.random()*3)+'s';
+      f.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 0 C10 4 10 10 7 14 C4 10 4 4 7 0 Z" fill="#f4ecd8" opacity="0.8"/></svg>`;
+      document.body.appendChild(f);
+      setTimeout(()=>f.remove(), 8500);
+    }, i*350);
+  }
+}
+</script>
+</body>
+</html>
